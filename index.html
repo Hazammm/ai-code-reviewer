@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CodeLens — AI Code Reviewer</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a24;
+      --border: #2a2a3a;
+      --accent: #00ff9d;
+      --accent2: #7c6af7;
+      --accent3: #ff6b6b;
+      --text: #e8e8f0;
+      --muted: #6b6b80;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: var(--sans);
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .badge.powered {
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    /* Layout */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .workspace { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.25rem;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .panel-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      flex: 1;
+      min-width: 130px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus { border-color: var(--accent); }
+
+    /* Code editor area */
+    #code-input {
+      width: 100%;
+      min-height: 380px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      line-height: 1.7;
+      padding: 1.25rem;
+      resize: vertical;
+      outline: none;
+      tab-size: 2;
+    }
+
+    #code-input::placeholder { color: var(--muted); }
+
+    /* Review button */
+    .review-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      width: calc(100% - 2.5rem);
+      margin: 1rem 1.25rem;
+      padding: 0.9rem;
+      background: var(--accent);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: all 0.2s;
+    }
+
+    .review-btn:hover:not(:disabled) {
+      background: #00ffb3;
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(0,255,157,0.3);
+    }
+
+    .review-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .review-btn.loading {
+      background: var(--surface2);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(0,255,157,0.3);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Output panel */
+    #output {
+      padding: 1.25rem;
+      min-height: 450px;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      line-height: 1.8;
+      overflow-y: auto;
+    }
+
+    .placeholder-msg {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 380px;
+      color: var(--muted);
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .placeholder-msg .icon {
+      font-size: 3rem;
+      opacity: 0.3;
+    }
+
+    .placeholder-msg p { font-size: 0.8rem; max-width: 250px; line-height: 1.6; }
+
+    /* Markdown rendered output */
+    #output h2 {
+      font-family: var(--sans);
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin: 1.5rem 0 0.6rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    #output h2:first-child { margin-top: 0; }
+
+    #output p { margin-bottom: 0.8rem; color: var(--text); }
+
+    #output ul, #output ol {
+      margin: 0.5rem 0 0.8rem 1.2rem;
+      color: var(--text);
+    }
+
+    #output li { margin-bottom: 0.3rem; }
+
+    #output code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      color: var(--accent);
+    }
+
+    #output pre {
+      background: #0d0d14 !important;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.8rem 0;
+    }
+
+    #output pre code {
+      background: none;
+      border: none;
+      padding: 0;
+      color: inherit;
+    }
+
+    #output strong { color: var(--accent2); }
+
+    /* Stats bar */
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface2);
+      border-top: 1px solid var(--border);
+      font-size: 0.72rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .stat { display: flex; align-items: center; gap: 0.4rem; }
+    .stat-val { color: var(--accent); font-weight: 600; }
+
+    /* Error */
+    .error-msg {
+      background: rgba(255,107,107,0.1);
+      border: 1px solid var(--accent3);
+      border-radius: 8px;
+      padding: 1rem;
+      color: var(--accent3);
+      font-size: 0.85rem;
+    }
+
+    /* Char counter */
+    .char-count {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .char-count.warn { color: #ffaa00; }
+    .char-count.danger { color: var(--accent3); }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="logo">Code<span>Lens</span></div>
+    <span class="badge">v1.0</span>
+    <span class="badge powered">Powered by Claude</span>
+  </header>
+
+  <div class="workspace">
+    <!-- Input Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title"><span class="dot"></span> Input</span>
+        <span class="char-count" id="char-count">0 / 10,000</span>
+      </div>
+
+      <div class="controls">
+        <select id="language">
+          <option value="auto-detect">🔍 Auto-detect</option>
+          <option value="Python">Python</option>
+          <option value="JavaScript">JavaScript</option>
+          <option value="TypeScript">TypeScript</option>
+          <option value="C++">C++</option>
+          <option value="C">C</option>
+          <option value="Java">Java</option>
+          <option value="PHP">PHP</option>
+          <option value="Go">Go</option>
+          <option value="Rust">Rust</option>
+          <option value="SQL">SQL</option>
+          <option value="Assembly">Assembly</option>
+          <option value="Bash">Bash</option>
+        </select>
+        <select id="focus">
+          <option value="general">⚡ General Review</option>
+          <option value="security">🔒 Security Focus</option>
+          <option value="performance">🚀 Performance Focus</option>
+          <option value="style">🧹 Style & Quality</option>
+        </select>
+      </div>
+
+      <textarea id="code-input" placeholder="// Paste your code here...&#10;// Supports all languages ✦"></textarea>
+
+      <button class="review-btn" id="review-btn" onclick="reviewCode()">
+        ✦ Review My Code
+      </button>
+    </div>
+
+    <!-- Output Panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">⬡ Analysis</span>
+        <span id="status-badge" class="badge">Idle</span>
+      </div>
+
+      <div id="output">
+        <div class="placeholder-msg">
+          <div class="icon">⬡</div>
+          <p>Paste your code on the left and hit Review to get an AI-powered analysis.</p>
+        </div>
+      </div>
+
+      <div class="stats-bar" id="stats-bar" style="display:none">
+        <div class="stat">Tokens used: <span class="stat-val" id="stat-tokens">—</span></div>
+        <div class="stat">Time: <span class="stat-val" id="stat-time">—</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const input = document.getElementById('code-input');
+  const charCount = document.getElementById('char-count');
+
+  input.addEventListener('input', () => {
+    const len = input.value.length;
+    charCount.textContent = `${len.toLocaleString()} / 10,000`;
+    charCount.className = 'char-count' + (len > 9000 ? ' danger' : len > 7000 ? ' warn' : '');
+  });
+
+  // Tab support in textarea
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const s = input.selectionStart, end = input.selectionEnd;
+      input.value = input.value.substring(0, s) + '  ' + input.value.substring(end);
+      input.selectionStart = input.selectionEnd = s + 2;
+    }
+  });
+
+  async function reviewCode() {
+    const code = input.value.trim();
+    if (!code) { alert('Please paste some code first!'); return; }
+
+    const btn = document.getElementById('review-btn');
+    const output = document.getElementById('output');
+    const statusBadge = document.getElementById('status-badge');
+    const statsBar = document.getElementById('stats-bar');
+
+    btn.disabled = true;
+    btn.className = 'review-btn loading';
+    btn.innerHTML = '<div class="spinner"></div> Analyzing...';
+    statusBadge.textContent = 'Reviewing';
+    statsBar.style.display = 'none';
+    output.innerHTML = '<div class="placeholder-msg"><div class="icon">⬡</div><p>Claude is reviewing your code...</p></div>';
+
+    const startTime = Date.now();
+
+    try {
+      const res = await fetch('/review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code,
+          language: document.getElementById('language').value,
+          focus: document.getElementById('focus').value
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || 'Server error');
+      }
+
+      const data = await res.json();
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      // Render markdown
+      output.innerHTML = marked.parse(data.review);
+
+      // Syntax highlight code blocks
+      output.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
+
+      // Stats
+      document.getElementById('stat-tokens').textContent = data.tokens_used?.toLocaleString() ?? '—';
+      document.getElementById('stat-time').textContent = `${elapsed}s`;
+      statsBar.style.display = 'flex';
+      statusBadge.textContent = 'Done ✓';
+
+    } catch (err) {
+      output.innerHTML = `<div class="error-msg">⚠ ${err.message}</div>`;
+      statusBadge.textContent = 'Error';
+    } finally {
+      btn.disabled = false;
+      btn.className = 'review-btn';
+      btn.innerHTML = '✦ Review My Code';
+    }
+  }
+</script>
+</body>
+</html>
