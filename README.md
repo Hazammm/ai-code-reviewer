@@ -18,7 +18,7 @@ An AI-powered code review tool built with **FastAPI** + **Claude API**. Paste an
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone the repo
 ```bash
@@ -46,7 +46,7 @@ uvicorn main:app --reload --port 8000
 ```
 
 ### 5. Open the app
-Visit [http://localhost:8000](http://localhost:8000) in your browser.
+Visit localhost in your browser.
 
 ---
 
@@ -98,30 +98,30 @@ ai-code-reviewer/
 
 ---
 
-## 📝 Example Review Output
+## Example Review Output
 
 ```
-## 🔍 Overview
+##  Overview
 The function implements a basic bubble sort with O(n²) complexity...
 
-## 🐛 Bugs & Issues
+## Bugs & Issues
 - Off-by-one error on line 7: range should be range(n-1)
 
-## ⚡ Performance
+## Performance
 - Consider using Python's built-in sorted() for production use
 
-## 🔒 Security
+##  Security
 No security issues detected.
 
-## ✅ Improved Code
+##  Improved Code
 ...
 
-## 📚 Summary
+## Summary
 Score: 6/10 — Good structure but has a critical bug and can be optimized.
 ```
 
 ---
 
-## 📄 License
+##  License
 
 MIT — free to use, modify, and distribute.
