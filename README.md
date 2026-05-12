@@ -8,7 +8,7 @@ An AI-powered code review tool built with **FastAPI** + **Claude API**. Paste an
 
 ---
 
-## ✨ Features
+## Features
 
 - **Multi-language support** — Python, JS, C++, PHP, SQL, Assembly, and more
 - **4 review modes** — General, Security, Performance, Style & Quality
