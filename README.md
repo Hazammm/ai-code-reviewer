@@ -22,14 +22,14 @@ An AI-powered code review tool built with **FastAPI** + **Claude API**. Paste an
 - **4 review modes** — General, Security, Performance, Style
 - **Structured output** — Bugs, Security, Performance, improved code + score
 - **Dark terminal UI** — clean, dev-friendly interface
-- **Token tracking** — see usage per review
+- **Token tracking** — see usage per review 
 
 ---
 
 ## 🚀 Quick Start
 
 ```bash
-# 1. Clone
+# 1. Clone the repo
 git clone https://github.com/YOUR_USERNAME/ai-code-reviewer.git
 cd ai-code-reviewer
 
