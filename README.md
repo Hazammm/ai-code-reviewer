@@ -1,179 +1,50 @@
 # 🔍 CodeLens — AI Code Reviewer
 
-
-AI-powered code review tool built with **Flask** + **Claude API**. Paste any code, get instant structured feedback on bugs, security, performance, and style.
+**AI-powered code review tool** built with **Flask + Claude (Anthropic)**.  
+Paste your code, choose a focus, and get structured, high-quality feedback instantly.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)
 ![Flask](https://img.shields.io/badge/Flask-3.0-black?style=flat-square)
-=======
-An AI-powered code review tool built with **FastAPI** + **Claude API**. Paste any code, get instant feedback on bugs, security, performance, and style.
-
-![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?style=flat-square)
-![Claude](https://img.shields.io/badge/Powered%20by-Claude%20AI-orange?style=flat-square)
-
----
-
+![Claude](https://img.shields.io/badge/Powered%20by-Claude%20Sonnet-orange?style=flat-square)
 
 ## ✨ Features
 
-- **13 languages** — Python, JS, C++, PHP, SQL, Assembly, and more
-- **4 review modes** — General, Security, Performance, Style
-- **Structured output** — Bugs, Security, Performance, improved code + score
-- **Dark terminal UI** — clean, dev-friendly interface
-- **Token tracking** — see usage per review 
-
----
+- **13+ languages** supported
+- **4 Review Modes**: General, Security, Performance, Style & Quality
+- **Structured Output** with bugs, security, performance, improved code & score
+- Beautiful dark terminal-style UI
+- Token usage tracking
+- Fast and responsive
 
 ## 🚀 Quick Start
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/ai-code-reviewer.git
+git clone https://github.com/Hazammm/ai-code-reviewer.git
 cd ai-code-reviewer
 
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Add API key
+# 3. Add your Anthropic API key
 cp .env.example .env
-# Edit .env → ANTHROPIC_API_KEY=your_key_here
-# Get one free at: https://console.anthropic.com
-
-# 4. Run
+# Edit .env and put your key
+# 4. Run the app
 python app.py
 
-# 5. Open → http://localhost:5000
-```
+Open http://localhost:5000
 
-=======
-## Features
-
-- **Multi-language support** — Python, JS, C++, PHP, SQL, Assembly, and more
-- **4 review modes** — General, Security, Performance, Style & Quality
-- **Structured reviews** — Bugs, Security, Performance, improved code, and a score
-- **Clean dark UI** — terminal-aesthetic frontend, no frameworks needed
-- **Token usage tracking** — see how much each review costs
-
----
-
-##  Quick Start
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/YOUR_USERNAME/ai-code-reviewer.git
-cd ai-code-reviewer
-```
-
-### 2. Set up the backend
-```bash
-cd backend
-pip install -r requirements.txt
-```
-
-### 3. Add your API key
-```bash
-cp .env.example .env
-# Edit .env and add your Anthropic API key
-# Get one free at: https://console.anthropic.com
-```
-
-### 4. Run the server
-```bash
-cd backend
-uvicorn main:app --reload --port 8000
-```
-
-### 5. Open the app
-Visit localhost in your browser.
-
----
-
-## 📁 Project Structure
-
-```
-ai-code-reviewer/
-<<<<<<< HEAD
-├── app.py                  # Flask app + Claude integration
-├── templates/
-│   └── index.html          # Jinja2 template
-├── static/
-│   ├── css/style.css       # Styles
-│   └── js/main.js          # Frontend logic
+📁 Project Structure
+textai-code-reviewer/
+├── app.py
 ├── requirements.txt
 ├── .env.example
-=======
-├── backend/
-│   ├── main.py           # FastAPI app + Claude integration
-│   └── requirements.txt  # Python dependencies
-├── frontend/
-│   └── index.html        # Single-file UI (HTML + CSS + JS)
-├── .env.example          # Environment variable template
 ├── .gitignore
-└── README.md
-```
-
----
-
-## 🔌 API
-
-| Method | Route     | Description            |
-|--------|-----------|------------------------|
-| GET    | `/`       | Main UI                |
-| POST   | `/review` | Submit code for review |
-| GET    | `/health` | Health check           |
-
-## 🛠 Stack
-
-| Layer    | Tech               |
-|----------|--------------------|
-| Backend  | Flask, Python      |
-| AI       | Anthropic Claude   |
-| Frontend | Jinja2, CSS, JS    |
-| Env      | python-dotenv      |
-
----
-
-## 📄 License
-
-MIT
-=======
-## 🛠 Tech Stack
-
-| Layer    | Tech                    |
-|----------|-------------------------|
-| Backend  | FastAPI, Uvicorn        |
-| AI       | Anthropic Claude API    |
-| Frontend | Vanilla HTML/CSS/JS     |
-| Fonts    | JetBrains Mono, Syne    |
-
----
-
-## Example Review Output
-
-```
-##  Overview
-The function implements a basic bubble sort with O(n²) complexity...
-
-## Bugs & Issues
-- Off-by-one error on line 7: range should be range(n-1)
-
-## Performance
-- Consider using Python's built-in sorted() for production use
-
-##  Security
-No security issues detected.
-
-##  Improved Code
-...
-
-## Summary
-Score: 6/10 — Good structure but has a critical bug and can be optimized.
-```
-
----
-
-##  License
-
-MIT — free to use, modify, and distribute.
-
+├── Dockerfile
+├── templates/
+│   └── index.html
+└── static/
+    ├── css/
+    │   └── style.css
+    └── js/
+        └── main.js
