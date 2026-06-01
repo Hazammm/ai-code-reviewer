@@ -1,6 +1,6 @@
 # 🔍 CodeLens — AI Code Reviewer
 
-<<<<<<< HEAD
+
 AI-powered code review tool built with **Flask** + **Claude API**. Paste any code, get instant structured feedback on bugs, security, performance, and style.
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)
@@ -10,12 +10,11 @@ An AI-powered code review tool built with **FastAPI** + **Claude API**. Paste an
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green?style=flat-square)
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
 ![Claude](https://img.shields.io/badge/Powered%20by-Claude%20AI-orange?style=flat-square)
 
 ---
 
-<<<<<<< HEAD
+
 ## ✨ Features
 
 - **13 languages** — Python, JS, C++, PHP, SQL, Assembly, and more
@@ -88,7 +87,6 @@ uvicorn main:app --reload --port 8000
 ### 5. Open the app
 Visit localhost in your browser.
 
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
 ---
 
 ## 📁 Project Structure
@@ -112,13 +110,11 @@ ai-code-reviewer/
 │   └── index.html        # Single-file UI (HTML + CSS + JS)
 ├── .env.example          # Environment variable template
 ├── .gitignore
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
 └── README.md
 ```
 
 ---
 
-<<<<<<< HEAD
 ## 🔌 API
 
 | Method | Route     | Description            |
@@ -144,20 +140,19 @@ ai-code-reviewer/
 ```json
 {
   "code": "def add(a, b):\n    return a + b",
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
+>>>>>>> 
   "language": "Python",
   "focus": "general"
 }
 ```
-<<<<<<< HEAD
 =======
 
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
+>>>>>>> 
 `focus` options: `general` | `security` | `performance` | `style`
 
 ---
 
-<<<<<<< HEAD
+
 ## 🛠 Stack
 
 | Layer    | Tech               |
