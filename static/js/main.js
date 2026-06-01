@@ -1,81 +1,91 @@
-const input = document.getElementById('code-input');
-const charCount = document.getElementById('char-count');
+let currentReview = "";
 
-// Character counter
-input.addEventListener('input', () => {
-  const len = input.value.length;
-  charCount.textContent = `${len.toLocaleString()} / 10,000`;
-  charCount.className = 'char-count' +
-    (len > 9000 ? ' danger' : len > 7000 ? ' warn' : '');
-});
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 2500);
+}
 
-// Tab key support inside textarea
-input.addEventListener('keydown', (e) => {
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    const s = input.selectionStart;
-    const end = input.selectionEnd;
-    input.value = input.value.substring(0, s) + '  ' + input.value.substring(end);
-    input.selectionStart = input.selectionEnd = s + 2;
-  }
-});
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    showToast("Copied to clipboard!");
+  });
+}
 
-async function reviewCode() {
-  const code = input.value.trim();
-  if (!code) { alert('Please paste some code first!'); return; }
+function loadExample() {
+  const examples = {
+    "Python": `def fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)\n\nprint(fibonacci(35))`,
+    "JavaScript": `function processData(data) {\n    return data.map(item => item.value * 2);\n}`,
+  };
+  
+  document.getElementById('code-input').value = examples["Python"];
+  document.getElementById('language').value = "Python";
+  showToast("Example loaded!");
+}
 
+async function submitReview() {
+  const code = document.getElementById('code-input').value.trim();
+  const language = document.getElementById('language').value;
+  const focus = document.getElementById('focus').value;
   const btn = document.getElementById('review-btn');
-  const output = document.getElementById('output');
-  const statusBadge = document.getElementById('status-badge');
-  const statsBar = document.getElementById('stats-bar');
+  const btnText = document.getElementById('btn-text');
+  const loading = document.getElementById('loading');
 
-  // Loading state
+  if (!code) {
+    showToast("Please paste some code first!");
+    return;
+  }
+
+  // UI Loading State
   btn.disabled = true;
-  btn.className = 'review-btn loading';
-  btn.innerHTML = '<span class="spinner"></span> Analyzing...';
-  statusBadge.textContent = 'Reviewing';
-  statsBar.style.display = 'none';
-  output.innerHTML = '<div class="placeholder-msg"><div class="icon">⬡</div><p>Claude is reviewing your code...</p></div>';
-
-  const startTime = Date.now();
+  btnText.classList.add('hidden');
+  loading.classList.remove('hidden');
 
   try {
-    const res = await fetch('/review', {
+    const response = await fetch('/review', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        code,
-        language: document.getElementById('language').value,
-        focus: document.getElementById('focus').value
-      })
+      body: JSON.stringify({ code, language, focus })
     });
 
-    const data = await res.json();
+    const data = await response.json();
 
-    if (!res.ok) {
-      throw new Error(data.error || 'Server error');
-    }
+    if (data.error) throw new Error(data.error);
 
-    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    currentReview = data.review;
 
-    // Render markdown
-    output.innerHTML = marked.parse(data.review);
+    // Display Result
+    document.getElementById('result-panel').style.display = 'flex';
+    document.getElementById('review-content').innerHTML = marked.parse ? marked.parse(data.review) : data.review;
+    
+    document.getElementById('model-info').textContent = `Model: ${data.model}`;
+    document.getElementById('token-info').textContent = `Tokens: ${data.tokens}`;
 
-    // Syntax highlight code blocks
-    output.querySelectorAll('pre code').forEach(el => hljs.highlightElement(el));
-
-    // Show stats
-    document.getElementById('stat-tokens').textContent = data.tokens_used?.toLocaleString() ?? '—';
-    document.getElementById('stat-time').textContent = `${elapsed}s`;
-    statsBar.style.display = 'flex';
-    statusBadge.textContent = 'Done ✓';
+    // Highlight code blocks
+    hljs.highlightAll();
 
   } catch (err) {
-    output.innerHTML = `<div class="error-msg">⚠ ${err.message}</div>`;
-    statusBadge.textContent = 'Error';
+    showToast("Error: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.className = 'review-btn';
-    btn.innerHTML = '✦ Review My Code';
+    btnText.classList.remove('hidden');
+    loading.classList.add('hidden');
   }
 }
+
+function copyReview() {
+  if (currentReview) copyToClipboard(currentReview);
+}
+
+function clearReview() {
+  document.getElementById('result-panel').style.display = 'none';
+  document.getElementById('code-input').value = '';
+}
+
+// Allow Ctrl/Cmd + Enter to submit
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    submitReview();
+  }
+});
