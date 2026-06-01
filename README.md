@@ -123,36 +123,6 @@ ai-code-reviewer/
 | POST   | `/review` | Submit code for review |
 | GET    | `/health` | Health check           |
 
-### POST `/review`
-```json
-{
-  "code": "your code here",
-=======
-## 🔌 API Endpoints
-
-| Method | Endpoint  | Description              |
-|--------|-----------|--------------------------|
-| POST   | `/review` | Submit code for review   |
-| GET    | `/health` | Health check             |
-| GET    | `/`       | Serve frontend UI        |
-
-### POST `/review` — Request Body
-```json
-{
-  "code": "def add(a, b):\n    return a + b",
->>>>>>> 
-  "language": "Python",
-  "focus": "general"
-}
-```
-=======
-
->>>>>>> 
-`focus` options: `general` | `security` | `performance` | `style`
-
----
-
-
 ## 🛠 Stack
 
 | Layer    | Tech               |
@@ -206,4 +176,4 @@ Score: 6/10 — Good structure but has a critical bug and can be optimized.
 ##  License
 
 MIT — free to use, modify, and distribute.
->>>>>>> e6d47ca2fb27a3bb2f7713a9d4c63f51431dcc52
+
