@@ -32,7 +32,7 @@ ENV/
 env.bak/
 venv.bak/
 
-# IDE and editor files
+# IDE
 .vscode/
 .idea/
 *.swp
@@ -43,11 +43,3 @@ venv.bak/
 # Logs
 *.log
 logs/
-
-# Docker
-.dockerignore
-__pycache__/
-
-# Temporary files
-*.tmp
-*.temp

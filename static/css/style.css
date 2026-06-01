@@ -1,8 +1,4 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -11,23 +7,14 @@ body {
   line-height: 1.6;
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 2rem;
-}
+.container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
 
-header {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
-
+header { text-align: center; margin-bottom: 2.5rem; }
 header h1 {
   font-size: 2.8rem;
   background: linear-gradient(90deg, #00ff9d, #00b8ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
 }
 
 .main {
@@ -46,16 +33,7 @@ header h1 {
   flex-direction: column;
 }
 
-.input-panel h2, .result-header h2 {
-  margin-bottom: 1rem;
-  color: #00ff9d;
-}
-
-.controls {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
+.controls { display: flex; gap: 1rem; margin-bottom: 1rem; }
 
 .select {
   flex: 1;
@@ -64,7 +42,6 @@ header h1 {
   border: 1px solid #3a3a44;
   border-radius: 10px;
   color: #e0e0e0;
-  font-size: 1rem;
 }
 
 textarea {
@@ -74,16 +51,10 @@ textarea {
   border-radius: 12px;
   padding: 1.2rem;
   color: #e0e0e0;
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: 'Consolas', monospace;
   font-size: 1.05rem;
   resize: none;
-  min-height: 400px;
-}
-
-.actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 1rem;
+  min-height: 420px;
 }
 
 .btn {
@@ -93,7 +64,6 @@ textarea {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 1.05rem;
 }
 
 .btn.primary {
@@ -102,43 +72,13 @@ textarea {
   flex: 1;
 }
 
-.btn.secondary {
-  background: #2a2a32;
-  color: #e0e0e0;
-}
+.btn.secondary { background: #2a2a32; color: #e0e0e0; }
 
-.btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 255, 157, 0.2);
-}
+.result-panel { display: none; }
 
-.result-panel {
-  display: none;
-}
+.review-content { flex: 1; overflow-y: auto; padding: 1rem 0; }
 
-.review-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem 0;
-  line-height: 1.7;
-}
-
-.review-content h2, .review-content h3 {
-  margin: 1.2rem 0 0.6rem;
-  color: #00ff9d;
-}
-
-.result-actions {
-  margin-top: 1.5rem;
-  display: flex;
-  gap: 1rem;
-}
-
-.meta {
-  font-size: 0.9rem;
-  color: #888;
-  margin-top: 0.5rem;
-}
+.result-actions { margin-top: 1.5rem; display: flex; gap: 1rem; }
 
 .toast {
   position: fixed;
@@ -150,9 +90,8 @@ textarea {
   padding: 14px 28px;
   border-radius: 12px;
   font-weight: 600;
-  box-shadow: 0 10px 30px rgba(0, 255, 157, 0.3);
+  box-shadow: 0 10px 30px rgba(0,255,157,0.3);
   z-index: 1000;
-  transition: all 0.3s;
 }
 
 .hidden { display: none !important; }

@@ -8,7 +8,6 @@ load_dotenv()
 app = Flask(__name__)
 client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-# Strong system prompt
 SYSTEM_PROMPT = """You are an expert senior software engineer and code reviewer.
 Always respond using these exact markdown headers:
 
@@ -20,7 +19,7 @@ Always respond using these exact markdown headers:
 ## ✅ Improved Code
 ## 📊 Summary
 
-Be concise, direct, and educational. Provide actually improved, clean code in the Improved Code section."""
+Be concise, direct, and educational."""
 
 FOCUS_MAP = {
     "general": "Give a comprehensive review covering all aspects.",
@@ -38,11 +37,13 @@ FOCUS_OPTIONS = [
     ("style", "🧹 Style & Quality"),
 ]
 
+
 @app.route("/")
 def index():
     return render_template("index.html", 
                          languages=LANGUAGES, 
                          focus_options=FOCUS_OPTIONS)
+
 
 @app.route("/review", methods=["POST"])
 def review():
@@ -66,7 +67,7 @@ Code to review:
 ```"""
 
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",   # You can change to haiku for speed
+            model="claude-sonnet-4-20250514",
             max_tokens=4000,
             temperature=0.3,
             system=SYSTEM_PROMPT,
@@ -81,6 +82,7 @@ Code to review:
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
