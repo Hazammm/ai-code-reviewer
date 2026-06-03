@@ -3,60 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeLens — AI Code Reviewer</title>
+  <title>CodeLens — Premium AI Code Reviewer & Benchmarker</title>
+  
+  <!-- Font and Stylesheets -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
 </head>
 <body>
+  <div class="glass-bg"></div>
+  
   <div class="container">
-    <header>
-      <h1>🔍 CodeLens</h1>
-      <p>AI-Powered Code Review with Claude</p>
+    <header class="main-header">
+      <div class="logo-area">
+        <span class="logo-icon">🔍</span>
+        <h1>CodeLens <span class="badge">PRO</span></h1>
+      </div>
+      <p class="subtitle">State-of-the-Art AI Code Review, Split Diffs & WebAssembly Benchmarking Sandbox</p>
     </header>
 
-    <div class="main">
-      <div class="panel input-panel">
-        <h2>Paste Your Code</h2>
-        
-        <div class="controls">
-          <select id="language" class="select">
-            {% for lang in languages %}
-              <option value="{{ lang }}">{{ lang }}</option>
-            {% endfor %}
-          </select>
+    <div class="main-grid">
+      <!-- LEFT PANEL: CODE INPUT & LOCAL METRICS -->
+      <div class="panel workspace-panel">
+        <div class="panel-header">
+          <h2>Code Workspace</h2>
+          <div class="actions-row">
+            <select id="language" class="select" onchange="changeEditorLanguage()">
+              {% for lang in languages %}
+                <option value="{{ lang }}">{{ lang }}</option>
+              {% endfor %}
+            </select>
 
-          <select id="focus" class="select">
-            {% for value, label in focus_options %}
-              <option value="{{ value }}">{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
-
-        <textarea id="code-input" placeholder="Paste your code here..."></textarea>
-
-        <div class="actions">
-          <button onclick="loadExample()" class="btn secondary">Load Example</button>
-          <button onclick="submitReview()" class="btn primary" id="review-btn">
-            <span id="btn-text">Review with Claude</span>
-            <span id="loading" class="hidden">Reviewing...</span>
-          </button>
-        </div>
-      </div>
-
-      <div class="panel result-panel" id="result-panel">
-        <div class="result-header">
-          <h2>AI Code Review</h2>
-          <div class="meta">
-            <span id="model-info"></span>
-            <span id="token-info"></span>
+            <select id="focus" class="select">
+              {% for value, label in focus_options %}
+                <option value="{{ value }}">{{ label }}</option>
+              {% endfor %}
+            </select>
           </div>
         </div>
         
-        <div id="review-content" class="review-content"></div>
+        <!-- Monaco Code Input Editor -->
+        <div class="editor-outer-container">
+          <div id="monaco-input-editor" class="editor-container"></div>
+        </div>
 
-        <div class="result-actions">
-          <button onclick="copyReview()" class="btn secondary">Copy Review</button>
-          <button onclick="clearReview()" class="btn secondary">New Review</button>
+        <div class="actions-row bottom-actions">
+          <button onclick="loadExample()" class="btn secondary">Load Python Example</button>
+          <button onclick="loadJSExample()" class="btn secondary">Load JS Example</button>
+          <button onclick="submitReview()" class="btn primary" id="review-btn">
+            <span id="btn-icon">⚡</span>
+            <span id="btn-text">Analyse & Review</span>
+            <span id="loading" class="hidden">Reviewing Stream...</span>
+          </button>
+        </div>
+
+        <!-- Metrics Dashboard -->
+        <div class="metrics-section">
+          <h3>Static Metrics Dashboard</h3>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-value" id="metric-loc">0</div>
+              <div class="metric-label">Lines of Code (LOC)</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="metric-lloc">0</div>
+              <div class="metric-label">Logical LOC (LLOC)</div>
+            </div>
+            <div class="metric-card" id="card-complexity">
+              <div class="metric-header">
+                <span class="metric-value" id="metric-complexity">0</span>
+                <span class="metric-rank" id="rank-complexity">A</span>
+              </div>
+              <div class="metric-label">Complexity (AST branches)</div>
+            </div>
+            <div class="metric-card" id="card-mi">
+              <div class="metric-header">
+                <span class="metric-value" id="metric-mi">0</span>
+                <span class="metric-rank" id="rank-mi">A</span>
+              </div>
+              <div class="metric-label">Maintainability Index</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: AI FEEDBACK, DIFFS, & PLAYGROUND -->
+      <div class="panel output-panel">
+        <div class="panel-header">
+          <div class="tabs-header">
+            <button class="tab-btn active" onclick="switchTab('review')">📝 AI Review</button>
+            <button class="tab-btn" onclick="switchTab('diff')">↔️ Split Diff</button>
+            <button class="tab-btn" onclick="switchTab('sandbox')">🧪 Run Sandbox</button>
+          </div>
+          <div class="meta-info">
+            <span id="model-info">Ready</span>
+            <span id="token-info"></span>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: REVIEW -->
+        <div id="tab-review" class="tab-content active">
+          <div id="review-content" class="review-content-area">
+            <div class="empty-state">
+              <span class="empty-icon">📝</span>
+              <p>Paste your code on the left and click "Analyse & Review" to view AI suggestions in real-time.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: DIFF -->
+        <div id="tab-diff" class="tab-content">
+          <!-- Timeline Slider -->
+          <div class="timeline-container">
+            <div class="timeline-labels">
+              <span class="timeline-step active" onclick="setSliderStep(0)" id="step-0">Original</span>
+              <span class="timeline-step" onclick="setSliderStep(1)" id="step-1">1. Security Fixes</span>
+              <span class="timeline-step" onclick="setSliderStep(2)" id="step-2">2. Performance</span>
+              <span class="timeline-step" onclick="setSliderStep(3)" id="step-3">3. Style & Docs</span>
+            </div>
+            <div class="slider-wrapper">
+              <input type="range" min="0" max="3" value="0" class="timeline-slider" id="timeline-slider" oninput="onSliderChange(this.value)">
+            </div>
+          </div>
+
+          <!-- Monaco Diff Editor -->
+          <div class="editor-outer-container diff-editor-outer">
+            <div id="monaco-diff-editor" class="editor-container"></div>
+          </div>
+
+          <div class="diff-actions bottom-actions">
+            <button onclick="applySelectedRefactoring()" class="btn primary">
+              <span>📋 Apply Current Refactoring</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: SANDBOX -->
+        <div id="tab-sandbox" class="tab-content">
+          <div class="sandbox-instructions">
+            <h3>WebAssembly Performance Benchmark & Sandbox</h3>
+            <p>Run the original code and the AI-refactored code in a client-side sandbox to compare performance and check regression results.</p>
+          </div>
+
+          <div class="sandbox-controls">
+            <button onclick="runBenchmark()" class="btn primary" id="run-sandbox-btn">
+              <span>🏃 Run Benchmark Test</span>
+            </button>
+            <div id="sandbox-status-text">Sandbox ready (Python: Pyodide, JS: Web Workers)</div>
+          </div>
+
+          <div class="sandbox-results-grid">
+            <div class="sandbox-console-box">
+              <h4>Console Outputs</h4>
+              <div class="sandbox-consoles-wrapper">
+                <div class="console-column">
+                  <h5>Original Version</h5>
+                  <pre id="console-original" class="console-output">Output logs will display here...</pre>
+                </div>
+                <div class="console-column">
+                  <h5>Refactored Version (Phase 3)</h5>
+                  <pre id="console-refactored" class="console-output">Output logs will display here...</pre>
+                </div>
+              </div>
+            </div>
+
+            <div class="sandbox-metrics-box">
+              <h4>Benchmark Comparison</h4>
+              <div class="benchmark-bar-container">
+                <div class="bar-label">Original Runtime: <span id="time-original">-</span></div>
+                <div class="bar-track">
+                  <div class="bar-fill original" id="bar-original" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="benchmark-bar-container">
+                <div class="bar-label">Refactored Runtime: <span id="time-refactored">-</span></div>
+                <div class="bar-track">
+                  <div class="bar-fill refactored" id="bar-refactored" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="sandbox-verdict" id="sandbox-verdict">
+                Run the benchmark to verify execution speedup and output equivalence.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -64,7 +195,13 @@
 
   <div id="toast" class="toast hidden"></div>
 
+  <!-- Third-party JS from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  
   <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
