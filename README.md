@@ -1,4 +1,4 @@
-# 🔍 CodeLens Pro — State-of-the-Art AI Code Reviewer
+#  CodeLens Pro — State-of-the-Art AI Code Reviewer
 
 **CodeLens Pro** is a premium, developer-centric code review and benchmarking platform. Built on **Flask + Claude 3.5 Sonnet (Anthropic)**, it elevates static code analysis into an interactive visual environment featuring split diff views, static complexity indexes, and client-side sandboxed benchmarking.
 
@@ -10,7 +10,7 @@
 
 ---
 
-## ✨ Features
+## Features
 
 ### 1. Monaco Editor & Split Diff Visualizer
 - Replaced standard textareas with **Monaco Editor** (the code editor powering VS Code), bringing syntax highlighting, line numbers, and indentation mapping.
@@ -40,7 +40,7 @@
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Clone & Set Up
 ```bash
@@ -66,7 +66,7 @@ Open `http://localhost:5000` in your browser.
 
 ---
 
-## 🐳 Docker Deployment
+##  Docker Deployment
 
 To build and run CodeLens Pro in a container:
 ```bash
@@ -79,7 +79,7 @@ docker run -p 5000:5000 --env-file .env codelens-pro
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 ai-code-reviewer/
